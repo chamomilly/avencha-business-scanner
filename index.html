@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advencha Business - Redemption Scanner</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,17 +15,16 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+
         .container {
             background: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .scanner {
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-        }
+
+
+
         .redemption-card {
             background: #f8f9fa;
             border: 2px solid #28a745;
@@ -32,18 +32,21 @@
             padding: 20px;
             margin: 20px 0;
         }
+
         .user-info {
             background: #e3f2fd;
             padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
         }
+
         .inclusion-info {
             background: #fff3cd;
             padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
         }
+
         .redeem-btn {
             background: #28a745;
             color: white;
@@ -55,13 +58,16 @@
             width: 100%;
             margin-top: 20px;
         }
+
         .redeem-btn:hover {
             background: #218838;
         }
+
         .redeem-btn:disabled {
             background: #6c757d;
             cursor: not-allowed;
         }
+
         .success {
             background: #d4edda;
             color: #155724;
@@ -69,6 +75,7 @@
             border-radius: 8px;
             margin: 15px 0;
         }
+
         .error {
             background: #f8d7da;
             color: #721c24;
@@ -76,25 +83,23 @@
             border-radius: 8px;
             margin: 15px 0;
         }
+
         .hidden {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🏪 Business Redemption Scanner</h1>
-        
-        <div id="scanner-section">
-            <p>Scan customer QR code to process redemption:</p>
-            <div id="qr-reader" class="scanner"></div>
-            <button onclick="startScanner()" id="start-btn">Start Scanner</button>
-        </div>
 
-        <div id="redemption-section" class="hidden">
+
+
+        <div id="redemption-section">
             <div class="redemption-card">
                 <h2>📱 Redemption Request</h2>
-                
+
                 <div class="user-info">
                     <h3>👤 Customer Details</h3>
                     <p><strong>User ID:</strong> <span id="user-id"></span></p>
@@ -115,53 +120,21 @@
                     ✅ Mark as Redeemed
                 </button>
 
-                <button onclick="resetScanner()" style="margin-top: 10px; background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    🔄 Scan Another
+                <button onclick="resetForm()"
+                    style="margin-top: 10px; background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    🔄 Reset
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Replace with your Supabase credentials
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        
+        const SUPABASE_URL = 'https://xtduanvxbgcnnwvkuiwp.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZHVhbnZ4Ymdjbm53dmt1aXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxMzYzMDAsImV4cCI6MjA3NTcxMjMwMH0.ZRpcpe2Vg2AOrxsEkFxSCSKIYMZYwtvC8PFllNAnNMU';
+
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        let html5QrcodeScanner;
+
         let currentRedemptionData = null;
-
-        function startScanner() {
-            html5QrcodeScanner = new Html5QrcodeScanner(
-                "qr-reader",
-                { fps: 10, qrbox: {width: 250, height: 250} },
-                false
-            );
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-            document.getElementById('start-btn').style.display = 'none';
-        }
-
-        async function onScanSuccess(decodedText, decodedResult) {
-            html5QrcodeScanner.clear();
-            
-            try {
-                // Parse QR code: advencha://redeem?user=123&map=1&step=2
-                const url = new URL(decodedText);
-                const userId = url.searchParams.get('user');
-                const mapId = parseInt(url.searchParams.get('map'));
-                const stepNumber = parseInt(url.searchParams.get('step'));
-
-                await loadRedemptionData(userId, mapId, stepNumber);
-                
-            } catch (error) {
-                showError('Invalid QR code format');
-            }
-        }
-
-        function onScanFailure(error) {
-            // Handle scan failure, usually better to ignore
-        }
 
         async function loadRedemptionData(userId, mapId, stepNumber) {
             try {
@@ -178,9 +151,20 @@
                     return;
                 }
 
-                // Get user details
-                const { data: user } = await supabase.auth.admin.getUserById(userId);
-                
+                // Get user details from auth.users table (if accessible) or use placeholder
+                let userEmail = 'Customer';
+                try {
+                    const { data: userData } = await supabase
+                        .from('auth.users')
+                        .select('email')
+                        .eq('id', userId)
+                        .single();
+                    userEmail = userData?.email || 'Customer';
+                } catch (error) {
+                    // If we can't access user data, just use the user ID
+                    userEmail = `User: ${userId.substring(0, 8)}...`;
+                }
+
                 // Get map and step details
                 const { data: mapData } = await supabase
                     .from('adventure_maps')
@@ -200,7 +184,7 @@
                     userId,
                     mapId,
                     stepNumber,
-                    userEmail: user?.user?.email || 'Unknown',
+                    userEmail: userEmail,
                     mapName: mapData?.name || 'Unknown Map',
                     stepLocation: stepData?.location || 'Unknown Location'
                 };
@@ -218,12 +202,12 @@
             document.getElementById('user-email').textContent = currentRedemptionData.userEmail;
             document.getElementById('map-name').textContent = currentRedemptionData.mapName;
             document.getElementById('step-location').textContent = currentRedemptionData.stepLocation;
-            
+
             // Set inclusion details (you may need to adjust based on your data structure)
             document.getElementById('inclusion-title').textContent = '1 drink'; // Default
             document.getElementById('inclusion-options').textContent = 'Choose from available options';
 
-            document.getElementById('scanner-section').classList.add('hidden');
+
             document.getElementById('redemption-section').classList.remove('hidden');
         }
 
@@ -251,7 +235,7 @@
 
                 showSuccess('✅ Redemption processed successfully!');
                 button.textContent = '✅ Redeemed';
-                
+
             } catch (error) {
                 showError('Error processing redemption: ' + error.message);
                 button.disabled = false;
@@ -259,10 +243,8 @@
             }
         }
 
-        function resetScanner() {
-            document.getElementById('scanner-section').classList.remove('hidden');
+        function resetForm() {
             document.getElementById('redemption-section').classList.add('hidden');
-            document.getElementById('start-btn').style.display = 'block';
             document.getElementById('status-message').innerHTML = '';
             currentRedemptionData = null;
         }
@@ -275,10 +257,38 @@
             document.getElementById('status-message').innerHTML = `<div class="error">${message}</div>`;
         }
 
-        // Auto-start scanner on page load
-        window.onload = function() {
-            startScanner();
-        };
+        // Auto-load redemption data from URL parameters or show dummy data
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('user');
+            const mapId = urlParams.get('map');
+            const stepNumber = urlParams.get('step');
+
+            if (userId && mapId && stepNumber) {
+                // Load redemption data directly from URL
+                loadRedemptionData(userId, parseInt(mapId), parseInt(stepNumber));
+            } else {
+                // Show dummy data
+                currentRedemptionData = {
+                    userId: '123',
+                    mapId: 1,
+                    stepNumber: 2,
+                    userEmail: 'customer@example.com',
+                    mapName: 'Downtown Food Tour',
+                    stepLocation: 'Main Street Cafe'
+                };
+                displayRedemptionData();
+            }
+        }; LSearchParams(window.location.search);
+        const userId = urlParams.get('user');
+        const mapId = urlParams.get('map');
+        const stepNumber = urlParams.get('step');
+
+        if (userId && mapId && stepNumber) {
+            // Load redemption data directly from URL
+            loadRedemptionData(userId, parseInt(mapId), parseInt(stepNumber));
+        }
     </script>
 </body>
+
 </html>
