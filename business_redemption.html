@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advencha Business - Redemption Scanner</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .scanner {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .redemption-card {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .user-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .inclusion-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .redeem-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .redeem-btn:hover {
+            background: #218838;
+        }
+        .redeem-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏪 Business Redemption Scanner</h1>
+        
+        <div id="scanner-section">
+            <p>Scan customer QR code to process redemption:</p>
+            <div id="qr-reader" class="scanner"></div>
+            <button onclick="startScanner()" id="start-btn">Start Scanner</button>
+        </div>
+
+        <div id="redemption-section" class="hidden">
+            <div class="redemption-card">
+                <h2>📱 Redemption Request</h2>
+                
+                <div class="user-info">
+                    <h3>👤 Customer Details</h3>
+                    <p><strong>User ID:</strong> <span id="user-id"></span></p>
+                    <p><strong>Email:</strong> <span id="user-email"></span></p>
+                </div>
+
+                <div class="inclusion-info">
+                    <h3>🎁 Redeeming</h3>
+                    <p><strong>Adventure:</strong> <span id="map-name"></span></p>
+                    <p><strong>Step:</strong> <span id="step-location"></span></p>
+                    <p><strong>Inclusion:</strong> <span id="inclusion-title"></span></p>
+                    <p><strong>Details:</strong> <span id="inclusion-options"></span></p>
+                </div>
+
+                <div id="status-message"></div>
+
+                <button class="redeem-btn" onclick="processRedemption()" id="redeem-button">
+                    ✅ Mark as Redeemed
+                </button>
+
+                <button onclick="resetScanner()" style="margin-top: 10px; background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    🔄 Scan Another
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Replace with your Supabase credentials
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let html5QrcodeScanner;
+        let currentRedemptionData = null;
+
+        function startScanner() {
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
+                { fps: 10, qrbox: {width: 250, height: 250} },
+                false
+            );
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            document.getElementById('start-btn').style.display = 'none';
+        }
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            html5QrcodeScanner.clear();
+            
+            try {
+                // Parse QR code: advencha://redeem?user=123&map=1&step=2
+                const url = new URL(decodedText);
+                const userId = url.searchParams.get('user');
+                const mapId = parseInt(url.searchParams.get('map'));
+                const stepNumber = parseInt(url.searchParams.get('step'));
+
+                await loadRedemptionData(userId, mapId, stepNumber);
+                
+            } catch (error) {
+                showError('Invalid QR code format');
+            }
+        }
+
+        function onScanFailure(error) {
+            // Handle scan failure, usually better to ignore
+        }
+
+        async function loadRedemptionData(userId, mapId, stepNumber) {
+            try {
+                // Check if already redeemed
+                const { data: existingRedemption } = await supabase
+                    .from('user_redemptions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('map_id', mapId)
+                    .eq('step_number', stepNumber);
+
+                if (existingRedemption && existingRedemption.length > 0) {
+                    showError('This inclusion has already been redeemed!');
+                    return;
+                }
+
+                // Get user details
+                const { data: user } = await supabase.auth.admin.getUserById(userId);
+                
+                // Get map and step details
+                const { data: mapData } = await supabase
+                    .from('adventure_maps')
+                    .select('name')
+                    .eq('id', mapId)
+                    .single();
+
+                const { data: stepData } = await supabase
+                    .from('map_steps')
+                    .select('location')
+                    .eq('map_id', mapId)
+                    .eq('step_number', stepNumber)
+                    .single();
+
+                // Store redemption data
+                currentRedemptionData = {
+                    userId,
+                    mapId,
+                    stepNumber,
+                    userEmail: user?.user?.email || 'Unknown',
+                    mapName: mapData?.name || 'Unknown Map',
+                    stepLocation: stepData?.location || 'Unknown Location'
+                };
+
+                // Show redemption interface
+                displayRedemptionData();
+
+            } catch (error) {
+                showError('Error loading redemption data: ' + error.message);
+            }
+        }
+
+        function displayRedemptionData() {
+            document.getElementById('user-id').textContent = currentRedemptionData.userId;
+            document.getElementById('user-email').textContent = currentRedemptionData.userEmail;
+            document.getElementById('map-name').textContent = currentRedemptionData.mapName;
+            document.getElementById('step-location').textContent = currentRedemptionData.stepLocation;
+            
+            // Set inclusion details (you may need to adjust based on your data structure)
+            document.getElementById('inclusion-title').textContent = '1 drink'; // Default
+            document.getElementById('inclusion-options').textContent = 'Choose from available options';
+
+            document.getElementById('scanner-section').classList.add('hidden');
+            document.getElementById('redemption-section').classList.remove('hidden');
+        }
+
+        async function processRedemption() {
+            const button = document.getElementById('redeem-button');
+            button.disabled = true;
+            button.textContent = 'Processing...';
+
+            try {
+                const businessLocation = prompt('Enter your business location:') || 'Unknown Location';
+
+                const { error } = await supabase
+                    .from('user_redemptions')
+                    .insert({
+                        user_id: currentRedemptionData.userId,
+                        map_id: currentRedemptionData.mapId,
+                        step_number: currentRedemptionData.stepNumber,
+                        inclusion_type: 'drink',
+                        inclusion_title: '1 drink',
+                        location: businessLocation,
+                        qr_code: `advencha://redeem?user=${currentRedemptionData.userId}&map=${currentRedemptionData.mapId}&step=${currentRedemptionData.stepNumber}`
+                    });
+
+                if (error) throw error;
+
+                showSuccess('✅ Redemption processed successfully!');
+                button.textContent = '✅ Redeemed';
+                
+            } catch (error) {
+                showError('Error processing redemption: ' + error.message);
+                button.disabled = false;
+                button.textContent = '✅ Mark as Redeemed';
+            }
+        }
+
+        function resetScanner() {
+            document.getElementById('scanner-section').classList.remove('hidden');
+            document.getElementById('redemption-section').classList.add('hidden');
+            document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('status-message').innerHTML = '';
+            currentRedemptionData = null;
+        }
+
+        function showSuccess(message) {
+            document.getElementById('status-message').innerHTML = `<div class="success">${message}</div>`;
+        }
+
+        function showError(message) {
+            document.getElementById('status-message').innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // Auto-start scanner on page load
+        window.onload = function() {
+            startScanner();
+        };
+    </script>
+</body>
+</html>
