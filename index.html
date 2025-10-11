@@ -4,291 +4,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advencha Business - Redemption Scanner</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
+    </style>
+    <title>Advencha Business</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-
-
-        .redemption-card {
-            background: #f8f9fa;
-            border: 2px solid #28a745;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .user-info {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .inclusion-info {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .redeem-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .redeem-btn:hover {
-            background: #218838;
-        }
-
-        .redeem-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>🏪 Business Redemption Scanner</h1>
-
+        <img src="resources/logo.svg">
 
 
         <div id="redemption-section">
             <div class="redemption-card">
-                <h2>📱 Redemption Request</h2>
+                <h2><span id="step-location"></span></h2>
 
                 <div class="user-info">
-                    <h3>👤 Customer Details</h3>
-                    <p><strong>User ID:</strong> <span id="user-id"></span></p>
-                    <p><strong>Email:</strong> <span id="user-email"></span></p>
+                    <p>Participant Name <span class="details" id="user-id"></span></p>
+                    <p>Payment Date <span class="details" id="payment-date"></span></p>
                 </div>
 
                 <div class="inclusion-info">
-                    <h3>🎁 Redeeming</h3>
-                    <p><strong>Adventure:</strong> <span id="map-name"></span></p>
-                    <p><strong>Step:</strong> <span id="step-location"></span></p>
-                    <p><strong>Inclusion:</strong> <span id="inclusion-title"></span></p>
-                    <p><strong>Details:</strong> <span id="inclusion-options"></span></p>
+                    <p>Included <span class="details" id="inclusion-title"></span></p>
+                    <p>Options <span class="details" id="inclusion-options"></span></p>
                 </div>
 
                 <div id="status-message"></div>
+                <div id="redeemed-card">
+                    <img src="resources/redeemed_icon.svg"><span>REDEEMED</span>
+                    <p><span class="details" id="redemption-date"></span></p>
+                </div>
 
+                <h3 id="disclaimer">Do not select redeem unless you are the venue. Doing so will result in not being
+                    able to claim your
+                    reward.</h3>
                 <button class="redeem-btn" onclick="processRedemption()" id="redeem-button">
-                    ✅ Mark as Redeemed
-                </button>
-
-                <button onclick="resetForm()"
-                    style="margin-top: 10px; background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    🔄 Reset
+                    REDEEM ORDER
                 </button>
             </div>
         </div>
     </div>
 
-    <script>
-        const SUPABASE_URL = 'https://xtduanvxbgcnnwvkuiwp.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZHVhbnZ4Ymdjbm53dmt1aXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxMzYzMDAsImV4cCI6MjA3NTcxMjMwMH0.ZRpcpe2Vg2AOrxsEkFxSCSKIYMZYwtvC8PFllNAnNMU';
-
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentRedemptionData = null;
-
-        async function loadRedemptionData(userId, mapId, stepNumber) {
-            try {
-                // Check if already redeemed
-                const { data: existingRedemption } = await supabase
-                    .from('user_redemptions')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .eq('map_id', mapId)
-                    .eq('step_number', stepNumber);
-
-                if (existingRedemption && existingRedemption.length > 0) {
-                    showError('This inclusion has already been redeemed!');
-                    return;
-                }
-
-                // Get user details from auth.users table (if accessible) or use placeholder
-                let userEmail = 'Customer';
-                try {
-                    const { data: userData } = await supabase
-                        .from('auth.users')
-                        .select('email')
-                        .eq('id', userId)
-                        .single();
-                    userEmail = userData?.email || 'Customer';
-                } catch (error) {
-                    // If we can't access user data, just use the user ID
-                    userEmail = `User: ${userId.substring(0, 8)}...`;
-                }
-
-                // Get map and step details
-                const { data: mapData } = await supabase
-                    .from('adventure_maps')
-                    .select('name')
-                    .eq('id', mapId)
-                    .single();
-
-                const { data: stepData } = await supabase
-                    .from('map_steps')
-                    .select('location')
-                    .eq('map_id', mapId)
-                    .eq('step_number', stepNumber)
-                    .single();
-
-                // Store redemption data
-                currentRedemptionData = {
-                    userId,
-                    mapId,
-                    stepNumber,
-                    userEmail: userEmail,
-                    mapName: mapData?.name || 'Unknown Map',
-                    stepLocation: stepData?.location || 'Unknown Location'
-                };
-
-                // Show redemption interface
-                displayRedemptionData();
-
-            } catch (error) {
-                showError('Error loading redemption data: ' + error.message);
-            }
-        }
-
-        function displayRedemptionData() {
-            document.getElementById('user-id').textContent = currentRedemptionData.userId;
-            document.getElementById('user-email').textContent = currentRedemptionData.userEmail;
-            document.getElementById('map-name').textContent = currentRedemptionData.mapName;
-            document.getElementById('step-location').textContent = currentRedemptionData.stepLocation;
-
-            // Set inclusion details (you may need to adjust based on your data structure)
-            document.getElementById('inclusion-title').textContent = '1 drink'; // Default
-            document.getElementById('inclusion-options').textContent = 'Choose from available options';
-
-
-            document.getElementById('redemption-section').classList.remove('hidden');
-        }
-
-        async function processRedemption() {
-            const button = document.getElementById('redeem-button');
-            button.disabled = true;
-            button.textContent = 'Processing...';
-
-            try {
-                const businessLocation = prompt('Enter your business location:') || 'Unknown Location';
-
-                const { error } = await supabase
-                    .from('user_redemptions')
-                    .insert({
-                        user_id: currentRedemptionData.userId,
-                        map_id: currentRedemptionData.mapId,
-                        step_number: currentRedemptionData.stepNumber,
-                        inclusion_type: 'drink',
-                        inclusion_title: '1 drink',
-                        location: businessLocation,
-                        qr_code: `advencha://redeem?user=${currentRedemptionData.userId}&map=${currentRedemptionData.mapId}&step=${currentRedemptionData.stepNumber}`
-                    });
-
-                if (error) throw error;
-
-                showSuccess('✅ Redemption processed successfully!');
-                button.textContent = '✅ Redeemed';
-
-            } catch (error) {
-                showError('Error processing redemption: ' + error.message);
-                button.disabled = false;
-                button.textContent = '✅ Mark as Redeemed';
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('redemption-section').classList.add('hidden');
-            document.getElementById('status-message').innerHTML = '';
-            currentRedemptionData = null;
-        }
-
-        function showSuccess(message) {
-            document.getElementById('status-message').innerHTML = `<div class="success">${message}</div>`;
-        }
-
-        function showError(message) {
-            document.getElementById('status-message').innerHTML = `<div class="error">${message}</div>`;
-        }
-
-        // Auto-load redemption data from URL parameters or show dummy data
-        window.onload = function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('user');
-            const mapId = urlParams.get('map');
-            const stepNumber = urlParams.get('step');
-
-            if (userId && mapId && stepNumber) {
-                // Load redemption data directly from URL
-                loadRedemptionData(userId, parseInt(mapId), parseInt(stepNumber));
-            } else {
-                // Show dummy data
-                currentRedemptionData = {
-                    userId: '123',
-                    mapId: 1,
-                    stepNumber: 2,
-                    userEmail: 'customer@example.com',
-                    mapName: 'Downtown Food Tour',
-                    stepLocation: 'Main Street Cafe'
-                };
-                displayRedemptionData();
-            }
-        }; LSearchParams(window.location.search);
-        const userId = urlParams.get('user');
-        const mapId = urlParams.get('map');
-        const stepNumber = urlParams.get('step');
-
-        if (userId && mapId && stepNumber) {
-            // Load redemption data directly from URL
-            loadRedemptionData(userId, parseInt(mapId), parseInt(stepNumber));
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

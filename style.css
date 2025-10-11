@@ -1,0 +1,151 @@
+body {
+    font-family: "Baloo 2", sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #061831;
+}
+
+.container {
+    padding: 30px;
+    align-items: center;
+    text-align: center;
+}
+
+h2 {
+    font-weight: 800;
+    font-size: 24;
+    color: #F7A829;
+}
+
+p {
+    color: white;
+    font-weight: 400;
+    font-size: 16;
+    text-align: left;
+
+    .details {
+        font-weight: 800;
+        font-size: 24;
+        text-align: right;
+    }
+}
+
+h3 {
+    color: #F7A829;
+    font-weight: 800;
+    font-size: 18;
+}
+
+
+
+.user-info {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.user-info p,
+.inclusion-info p {
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    margin: 0 auto;
+}
+
+#redemption-date-row {
+    justify-content: center !important;
+    text-align: center;
+}
+
+.inclusion-info {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.redeem-btn {
+    background: #EF553D;
+    color: #061831;
+    border: none;
+    font-weight: 600;
+    padding: 8px 24px;
+    font-size: 14px;
+    border-radius: 70px;
+    cursor: pointer;
+    /* width: 100%; */
+    margin-top: 20px;
+
+    &:hover,
+    &:active {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    &:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+}
+
+.reset-btn {
+    display: block;
+    margin-top: 10px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: center;
+}
+
+.success {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.hidden {
+    display: none;
+}
+
+#redeemed-card {
+    align-items: center;
+    text-align: center;
+    vertical-align: center;
+    display: none;
+}
+
+#redeemed-card img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+#redeemed-card span {
+    font-weight: 800;
+    font-size: 34px;
+    color: #EF553D;
+}
+
+#redeemed-card p {
+    text-align: center;
+    margin: 5px 0;
+}
+
+#redeemed-card p span {
+    font-weight: 800;
+    font-size: 24px;
+    margin: 0;
+    color: white;
+}
