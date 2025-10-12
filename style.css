@@ -1,9 +1,26 @@
+html {
+    background-color: #061831;
+    background-image: 
+        url('resources/top-left.svg'),
+        url('resources/top-right.svg'),
+        url('resources/bottom-left.svg'),
+        url('resources/bottom-right.svg');
+    background-position: 
+        top left,
+        top right,
+        bottom left,
+        bottom right;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
 body {
     font-family: "Baloo 2", sans-serif;
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #061831;
+    background: transparent;
 }
 
 .container {

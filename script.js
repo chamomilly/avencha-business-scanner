@@ -180,16 +180,7 @@ window.onload = function () {
         // Load redemption data directly from URL
         loadRedemptionData(userId, mapId, parseInt(stepNumber));
     } else {
-        // Show dummy data
-        currentRedemptionData = {
-            userId: '123',
-            mapId: 1,
-            stepNumber: 2,
-            userName: 'John Woa',
-            mapName: 'Downtown Food Tour',
-            stepLocation: 'Main Street Cafe',
-            paymentDate: new Date().toLocaleDateString()
-        };
-        displayRedemptionData();
+        // Show QR scan message
+        document.querySelector('.container').innerHTML = '<img src="resources/logo.svg"><h2>Use your camera to scan a QR code to get started</h2>';
     }
 };
