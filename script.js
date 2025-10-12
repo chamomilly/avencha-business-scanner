@@ -171,6 +171,8 @@ function showError(message) {
 
 // Auto-load redemption data from URL parameters or show dummy data
 window.onload = function () {
+    // Set version from config
+    document.getElementById('version').textContent = `v${CONFIG.VERSION}`;
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('user');
     const mapId = urlParams.get('map');
@@ -182,5 +184,6 @@ window.onload = function () {
     } else {
         // Show QR scan message
         document.querySelector('.container').innerHTML = '<img src="resources/logo.svg"><h2>Use your camera to scan a QR code to get started</h2>';
+        document.getElementById('version').textContent = `v${CONFIG.VERSION}`;
     }
 };

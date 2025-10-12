@@ -1,11 +1,11 @@
 html {
     background-color: #061831;
-    background-image: 
+    background-image:
         url('resources/top-left.svg'),
         url('resources/top-right.svg'),
         url('resources/bottom-left.svg'),
         url('resources/bottom-right.svg');
-    background-position: 
+    background-position:
         top left,
         top right,
         bottom left,
@@ -17,10 +17,10 @@ html {
 
 @media (max-width: 768px) {
     html {
-        background-image: 
+        background-image:
             url('resources/top-left.svg'),
             url('resources/bottom-left.svg');
-        background-position: 
+        background-position:
             top center,
             bottom center;
         background-size: 100% auto, 100% auto;
@@ -177,4 +177,13 @@ h3 {
     font-size: 24px;
     margin: 0;
     color: white;
+}
+
+.version {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    color: #888888;
+    font-size: 12px;
+    z-index: 1000;
 }
