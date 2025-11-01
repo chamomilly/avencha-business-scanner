@@ -25,6 +25,10 @@ html {
             bottom center;
         background-size: 100% auto, 100% auto;
     }
+
+    .container {
+        padding: 10px;
+    }
 }
 
 body {
