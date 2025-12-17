@@ -29,6 +29,11 @@ html {
     .container {
         padding: 10px;
     }
+
+    .user-info,
+    .inclusion-info {
+        padding: 15px 5px !important;
+    }
 }
 
 body {
@@ -106,7 +111,6 @@ h3 {
     font-size: 14px;
     border-radius: 70px;
     cursor: pointer;
-    /* width: 100%; */
     margin-top: 20px;
 
     &:hover,

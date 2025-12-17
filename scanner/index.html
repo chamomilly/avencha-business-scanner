@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
+    </style>
+    <title>Advencha Business</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <img src="resources/logo.svg">
+
+
+        <div id="redemption-section">
+            <div class="redemption-card">
+                <h2><span id="step-location"></span></h2>
+
+                <div class="user-info">
+                    <p>Participant Name <span class="details" id="user-id"></span></p>
+                    <p>Payment Date <span class="details" id="payment-date"></span></p>
+                </div>
+
+                <div class="inclusion-info">
+                    <p>Included <span class="details" id="inclusion-title"></span></p>
+                    <p>Options <span class="details" id="inclusion-options"></span></p>
+                </div>
+
+                <div id="status-message"></div>
+                <div id="redeemed-card">
+                    <img src="resources/redeemed_icon.svg"><span>REDEEMED</span>
+                    <p><span class="details" id="redemption-date"></span></p>
+                </div>
+
+                <h3 id="disclaimer">Do not select redeem unless you are the venue. Doing so will result in not being
+                    able to claim your
+                    reward.</h3>
+                <button class="redeem-btn" onclick="processRedemption()" id="redeem-button">
+                    REDEEM ORDER
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="version" id="version"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

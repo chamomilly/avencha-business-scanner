@@ -1,7 +1,7 @@
-const SUPABASE_URL = 'https://xtduanvxbgcnnwvkuiwp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZHVhbnZ4Ymdjbm53dmt1aXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxMzYzMDAsImV4cCI6MjA3NTcxMjMwMH0.ZRpcpe2Vg2AOrxsEkFxSCSKIYMZYwtvC8PFllNAnNMU';
+var SUPABASE_URL = 'https://xtduanvxbgcnnwvkuiwp.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZHVhbnZ4Ymdjbm53dmt1aXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxMzYzMDAsImV4cCI6MjA3NTcxMjMwMH0.ZRpcpe2Vg2AOrxsEkFxSCSKIYMZYwtvC8PFllNAnNMU';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentRedemptionData = null;
 let businessAuthenticated = false;
@@ -72,10 +72,11 @@ async function loadRedemptionData(userId, mapId, stepNumber) {
         const { data: purchaseData, error: purchaseError } = await supabase
             .from('user_purchases')
             .select('purchase_date')
-            .eq('user_id', userId)
-            .eq('map_id', mapId);
+            .eq('user_id', userId.toString())
+            .eq('map_id', parseInt(mapId));
 
         console.log('Purchase query result:', { purchaseData, purchaseError, userId: userId.toString(), mapId: parseInt(mapId) });
+        console.log('URL Parameters:', { userId, mapId, stepNumber });
 
         // Store redemption data
         currentRedemptionData = {
