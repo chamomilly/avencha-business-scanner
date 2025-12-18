@@ -30,9 +30,9 @@ html {
         padding: 10px;
     }
 
-    .user-info,
-    .inclusion-info {
-        padding: 15px 5px !important;
+    .user-info p,
+    .inclusion-info p {
+        width: 100% !important;
     }
 }
 
@@ -78,17 +78,23 @@ h3 {
 
 
 .user-info {
-    padding: 15px;
-    border-radius: 8px;
-    margin: 15px 0;
+    padding: 15px 5px 0px 5px;
+    margin-bottom: 0px;
 }
 
 .user-info p,
 .inclusion-info p {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: start;
     width: 65%;
+    text-align: left;
+    padding: 5px 0px;
     margin: 0 auto;
+}
+
+p .details {
+    text-align: left !important;
 }
 
 #redemption-date-row {
@@ -97,9 +103,8 @@ h3 {
 }
 
 .inclusion-info {
-    padding: 15px;
-    border-radius: 8px;
-    margin: 15px 0;
+    padding: 0px 5px 15px 5px;
+    margin-top: 0px;
 }
 
 .redeem-btn {

@@ -64,7 +64,7 @@ async function loadRedemptionData(userId, mapId, stepNumber) {
 
         const { data: stepData } = await supabase
             .from('map_steps')
-            .select('location, inclusion_title, inclusion_options, inclusion_instructions')
+            .select('location, inclusion_title, inclusion_options, inclusion_instructions, substitutions')
             .eq('map_id', mapId)
             .eq('step_number', stepNumber);
 
@@ -86,8 +86,9 @@ async function loadRedemptionData(userId, mapId, stepNumber) {
             userName: userName,
             mapName: mapData?.[0]?.name || 'Unknown Map',
             stepLocation: stepData?.[0]?.location || 'Unknown Location',
-            inclusionTitle: stepData?.[0]?.inclusion_title || '1 drink',
-            inclusionOptions: stepData?.[0]?.inclusion_options || 'Standard options',
+            inclusionTitle: stepData?.[0]?.inclusion_title || '',
+            inclusionOptions: (stepData?.[0]?.inclusion_options || '').replace(/,/g, '<br>'),
+            substitutions: stepData?.[0]?.substitutions || '',
             paymentDate: (purchaseData && purchaseData.length > 0 && purchaseData[0].purchase_date) ? new Date(purchaseData[0].purchase_date).toLocaleDateString() : 'Unknown',
             isAlreadyRedeemed,
             redemptionDate
@@ -119,7 +120,8 @@ function displayRedemptionData() {
 
     // Set inclusion details from database
     document.getElementById('inclusion-title').textContent = currentRedemptionData.inclusionTitle;
-    document.getElementById('inclusion-options').textContent = currentRedemptionData.inclusionOptions;
+    document.getElementById('inclusion-options').innerHTML = currentRedemptionData.inclusionOptions;
+    document.getElementById('substitutions').textContent = currentRedemptionData.substitutions;
 
     document.getElementById('redemption-section').classList.remove('hidden');
 }
