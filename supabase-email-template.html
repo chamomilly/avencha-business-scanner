@@ -10,7 +10,7 @@
 
         body {
             font-family: "Baloo 2", sans-serif;
-            background-color: #061831;
+            background-color: #061831 !important;
             margin: 0;
             padding: 20px;
             color: white;
@@ -19,9 +19,10 @@
         .email-container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #061831;
+            background-color: #061831 !important;
             padding: 30px;
             text-align: center;
+            border: 1px solid #061831;
         }
 
         .logo {
@@ -71,32 +72,32 @@
     </style>
 </head>
 
-<body>
-    <div class="email-container">
-        <div class="logo">
-            <img src="{{ .SiteURL }}/resources/logo.svg" alt="Advencha" style="max-width: 200px;">
-        </div>
+<body style="font-family: 'Baloo 2', sans-serif; background-color: #061831 !important; margin: 0; padding: 20px; color: white;">
+    <div class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #061831 !important; padding: 30px; text-align: center; border: 1px solid #061831;">
+
+        <img src="https://xtduanvxbgcnnwvkuiwp.supabase.co/storage/v1/object/public/logos/logo.png">
+
 
         <h1>Confirm Your Email Address</h1>
 
         <p>Welcome to Advencha! To complete your registration and start your adventure, please confirm your email
             address by clicking the button below.</p>
 
-        <a href="{{ .ConfirmationURL }}" class="confirm-btn">CONFIRM EMAIL</a>
+        <div
+            style="background-color: #F7A829; color: #061831; padding: 20px; border-radius: 10px; margin: 20px 0; font-size: 24px; font-weight: 800; letter-spacing: 3px;">
+            {{ .Token }}
+        </div>
 
-        <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-        <p style="word-break: break-all; color: #F7A829;">{{ .ConfirmationURL }}</p>
+        <p>Enter this 6-digit code in the Advencha app to confirm your email address.</p>
+
+        <p style="color: #888; font-size: 14px;">This code will expire in 10 minutes for your security.</p>
+
 
         <div class="footer">
             <p>If you didn't create an account with Advencha, you can safely ignore this email.</p>
-            <p>© 2024 Advencha. All rights reserved.</p>
+            <p>© 2025 Advencha Australia. All rights reserved.</p>
         </div>
     </div>
 </body>
 
 </html>
-
-<!-- <div class="logo">
-            <img src="https://xtduanvxbgcnnwvkuiwp.supabase.co/storage/v1/object/public/logos/logo.svg
-" alt="Advencha" style="max-width: 200px;">
-        </div> -->
