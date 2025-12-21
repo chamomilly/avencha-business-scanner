@@ -146,7 +146,7 @@ async function processRedemption() {
                 inclusion_type: currentRedemptionData.inclusionOptions,
                 inclusion_title: currentRedemptionData.inclusionTitle,
                 location: currentRedemptionData.stepLocation,
-                qr_code: `advencha://redeem?user=${currentRedemptionData.userId}&map=${currentRedemptionData.mapId}&step=${currentRedemptionData.stepNumber}`,
+                qr_code: `avencha://redeem?user=${currentRedemptionData.userId}&map=${currentRedemptionData.mapId}&step=${currentRedemptionData.stepNumber}`,
                 created_at: new Date().toISOString()
             });
 
