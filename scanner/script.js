@@ -172,6 +172,96 @@ function showError(message) {
     document.getElementById('status-message').innerHTML = `<div class="error">${message}</div>`;
 }
 
+async function startCamera() {
+    try {
+        const video = document.getElementById('camera');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        video.play();
+        
+        document.querySelector('h2').textContent = 'Point camera at QR code';
+        
+        // Start QR code scanning
+        scanQRCode(video);
+    } catch (error) {
+        alert('Camera access denied or not available');
+    }
+}
+
+function scanQRCode(video) {
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    
+    function tick() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            
+            if (code) {
+                handleScannedUrl(code.data);
+                return;
+            }
+        }
+        requestAnimationFrame(tick);
+    }
+    tick();
+}
+
+function handleScannedUrl(scannedUrl) {
+    try {
+        const url = new URL(scannedUrl);
+        const userId = url.searchParams.get('user');
+        const mapId = url.searchParams.get('map');
+        const stepNumber = url.searchParams.get('step');
+        
+        if (userId && mapId && stepNumber) {
+            // Stop camera
+            const video = document.getElementById('camera');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            
+            // Restore original HTML structure
+            document.querySelector('.container').innerHTML = `
+                <img src="resources/logo.svg">
+                <div id="redemption-section">
+                    <div class="redemption-card">
+                        <h2><span id="step-location"></span></h2>
+                        <div class="user-info">
+                            <p>Participant Name <span class="details" id="user-id"></span></p>
+                            <p>Payment Date <span class="details" id="payment-date"></span></p>
+                        </div>
+                        <div class="inclusion-info">
+                            <p>Included, For Each Paid Participant <span class="details" id="inclusion-title"></span></p>
+                            <p>Options to choose from<span class="details" id="inclusion-options"></span></p>
+                            <p>If sold out or dietary issues <span class="details" id="substitutions"></span></p>
+                        </div>
+                        <div id="status-message"></div>
+                        <div id="redeemed-card">
+                            <img src="resources/redeemed_icon.svg"><span>REDEEMED</span>
+                            <p><span class="details" id="redemption-date"></span></p>
+                        </div>
+                        <h3 id="disclaimer">Do not select redeem unless you are the venue. Doing so will result in not being able to claim your reward.</h3>
+                        <button class="redeem-btn" onclick="processRedemption()" id="redeem-button">REDEEM ORDER</button>
+                    </div>
+                </div>
+            `;
+            
+            // Load redemption data
+            loadRedemptionData(userId, mapId, parseInt(stepNumber));
+        } else {
+            alert('Invalid QR code format');
+        }
+    } catch (error) {
+        alert('Invalid URL in QR code');
+    }
+}
+
 // Auto-load redemption data from URL parameters or show dummy data
 window.onload = function () {
     // Set version from config
@@ -185,8 +275,14 @@ window.onload = function () {
         // Load redemption data directly from URL
         loadRedemptionData(userId, mapId, parseInt(stepNumber));
     } else {
-        // Show QR scan message
-        document.querySelector('.container').innerHTML = '<img src="resources/logo.svg"><h2>Use your camera to scan a QR code to get started</h2>';
+        // Show QR scan message with camera button
+        document.querySelector('.container').innerHTML = `
+            <img src="resources/logo.svg">
+            <h2>Use your camera to scan a QR code to get started</h2>
+            <button class="redeem-btn" onclick="startCamera()">OPEN CAMERA</button>
+            <video id="camera" style="width: 100%; max-width: 400px; display: none;"></video>
+            <canvas id="canvas" style="display: none;"></canvas>
+        `;
         document.getElementById('version').textContent = `v${CONFIG.VERSION}`;
     }
 };
