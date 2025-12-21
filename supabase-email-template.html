@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Your Email - Advencha</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
+
+        body {
+            font-family: "Baloo 2", sans-serif;
+            background-color: #061831;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #061831;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 28px;
+            color: #F7A829;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: white;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .confirm-btn {
+            background: #EF553D;
+            color: #061831;
+            border: none;
+            font-weight: 600;
+            padding: 12px 32px;
+            font-size: 16px;
+            border-radius: 70px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 0;
+            font-family: "Baloo 2", sans-serif;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .email-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="logo">
+            <img src="{{ .SiteURL }}/resources/logo.svg" alt="Advencha" style="max-width: 200px;">
+        </div>
+
+        <h1>Confirm Your Email Address</h1>
+
+        <p>Welcome to Advencha! To complete your registration and start your adventure, please confirm your email
+            address by clicking the button below.</p>
+
+        <a href="{{ .ConfirmationURL }}" class="confirm-btn">CONFIRM EMAIL</a>
+
+        <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+        <p style="word-break: break-all; color: #F7A829;">{{ .ConfirmationURL }}</p>
+
+        <div class="footer">
+            <p>If you didn't create an account with Advencha, you can safely ignore this email.</p>
+            <p>© 2024 Advencha. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<!-- <div class="logo">
+            <img src="https://xtduanvxbgcnnwvkuiwp.supabase.co/storage/v1/object/public/logos/logo.svg
+" alt="Advencha" style="max-width: 200px;">
+        </div> -->
