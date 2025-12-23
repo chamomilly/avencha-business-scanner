@@ -17,6 +17,17 @@ html {
 
 @media (max-width: 768px) {
     html {
+        background: none;
+    }
+
+    html::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #061831;
         background-image:
             url('resources/top-left.svg'),
             url('resources/bottom-left.svg');
@@ -24,6 +35,8 @@ html {
             top center,
             bottom center;
         background-size: 100% auto, 100% auto;
+        background-repeat: no-repeat;
+        z-index: -1;
     }
 
     .container {
