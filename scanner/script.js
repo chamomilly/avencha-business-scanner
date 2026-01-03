@@ -153,7 +153,7 @@ async function processRedemption() {
         if (error) throw error;
 
         // Update redemption date display and show redeemed card
-        document.getElementById('redemption-date').textContent = new Date().toLocaleDateString();
+        document.getElementById('redemption-date').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
         document.getElementById('redeemed-card').style.display = 'block';
         button.style.display = 'none';
         document.getElementById('disclaimer').style.display = 'none';
