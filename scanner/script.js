@@ -39,7 +39,7 @@ async function loadRedemptionData(userId, mapId, stepNumber) {
 
         if (existingRedemption && existingRedemption.length > 0) {
             isAlreadyRedeemed = true;
-            redemptionDate = new Date(existingRedemption[0].created_at).toLocaleDateString();
+            redemptionDate = new Date(existingRedemption[0].created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
         /// get from profiles table
@@ -89,7 +89,7 @@ async function loadRedemptionData(userId, mapId, stepNumber) {
             inclusionTitle: stepData?.[0]?.inclusion_title || '',
             inclusionOptions: (stepData?.[0]?.inclusion_options || '').replace(/,/g, '<br>'),
             substitutions: stepData?.[0]?.substitutions || '',
-            paymentDate: (purchaseData && purchaseData.length > 0 && purchaseData[0].purchase_date) ? new Date(purchaseData[0].purchase_date).toLocaleDateString() : 'Unknown',
+            paymentDate: (purchaseData && purchaseData.length > 0 && purchaseData[0].purchase_date) ? new Date(purchaseData[0].purchase_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Unknown',
             isAlreadyRedeemed,
             redemptionDate
         };
@@ -153,7 +153,7 @@ async function processRedemption() {
         if (error) throw error;
 
         // Update redemption date display and show redeemed card
-        document.getElementById('redemption-date').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        document.getElementById('redemption-date').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('redeemed-card').style.display = 'block';
         button.style.display = 'none';
         document.getElementById('disclaimer').style.display = 'none';
