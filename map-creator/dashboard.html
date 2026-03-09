@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
+    </style>
+    <title>Map Creator Dashboard - Advencha</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../scanner/style.css">
+    <style>
+        .form-group {
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: #F7A829;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: 'Baloo 2', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Baloo 2', sans-serif;
+        }
+
+        .step-container {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .add-step-btn {
+            background: #F7A829;
+            color: #061831;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Baloo 2', sans-serif;
+            margin: 10px 0;
+        }
+
+        .remove-step-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Baloo 2', sans-serif;
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="logout()" class="logout-btn">Logout</button>
+
+    <div class="container">
+        <img src="../scanner/resources/logo.svg" alt="Advencha">
+
+        <h2>Create Avencha Map</h2>
+
+        <div class="form-container">
+            <h3 style="color: #F7A829;">Map Details</h3>
+
+            <div class="form-group">
+                <label>Map Name</label>
+                <input type="text" id="name" placeholder="Enter map name">
+            </div>
+
+            <div class="form-group">
+                <label>Number of Attendees</label>
+                <input type="text" id="numberOfAttendees" placeholder="e.g., 2-4 people">
+            </div>
+
+            <div class="form-group">
+                <label>Cost ($)</label>
+                <input type="number" id="cost" step="0.01" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="tags" placeholder="food, adventure, nightlife">
+            </div>
+
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="location" placeholder="City or area">
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" placeholder="Describe the adventure"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Requirements (comma separated)</label>
+                <input type="text" id="requirements" placeholder="Valid ID, Comfortable shoes">
+            </div>
+
+            <div class="form-group">
+                <label>Duration Hours</label>
+                <input type="text" id="durationHours" placeholder="e.g., 3-4 hours">
+            </div>
+
+            <div class="form-group">
+                <label>Completion Hours</label>
+                <input type="text" id="completionHours" placeholder="e.g., 2-3 hours">
+            </div>
+
+            <div class="form-group">
+                <label>Image URL</label>
+                <input type="text" id="imageUrl" placeholder="https://...">
+            </div>
+
+            <h3 style="color: #F7A829; margin-top: 40px;">Map Steps</h3>
+
+            <div id="stepsContainer"></div>
+
+            <button onclick="addStep()" class="add-step-btn">+ Add Step</button>
+
+            <button onclick="createMap()" class="redeem-btn" style="width: 100%; margin-top: 20px;">CREATE MAP</button>
+
+            <div id="message" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
