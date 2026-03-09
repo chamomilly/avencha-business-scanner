@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
+    </style>
+    <title>Support Dashboard - Avencha</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../scanner/style.css">
+    <style>
+        .support-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Baloo 2', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="logout()" class="logout-btn">Logout</button>
+
+    <div class="container">
+        <a href="../index.html"><img src="../scanner/resources/logo.svg" alt="Avencha"></a>
+
+        <h2>Support Dashboard</h2>
+
+        <div class="support-container">
+            <h3 style="color: #F7A829;">Welcome to Support</h3>
+            <div> <a href="delete-account/" class="redeem-btn"
+                    style="text-decoration: none; display: inline-block; background: #EF553D;">
+                    DELETE ACCOUNT
+                </a></div>
+        </div>
+
+        <div class="footer" style="margin-top: 40px;">
+            <p style="text-align: center; color: #888; font-size: 14px;">
+                If you have any questions that are not answered here, please contact us at
+                <strong>support@avencha.com</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        var SUPABASE_URL = 'https://xtduanvxbgcnnwvkuiwp.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZHVhbnZ4Ymdjbm53dmt1aXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxMzYzMDAsImV4cCI6MjA3NTcxMjMwMH0.ZRpcpe2Vg2AOrxsEkFxSCSKIYMZYwtvC8PFllNAnNMU';
+
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        // Check auth on load
+        window.onload = async function () {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                window.location.href = 'index.html';
+            }
+        };
+    </script>
+</body>
+
+</html>

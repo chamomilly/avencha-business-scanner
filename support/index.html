@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
+    </style>
+    <title>Support Login - Avencha</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../scanner/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <a href="../index.html"><img src="../scanner/resources/logo.svg" alt="Avencha"></a>
+
+        <h2>Support Login</h2>
+
+        <div id="login-form" style="max-width: 400px; margin: 0 auto;">
+            <input type="email" id="email" placeholder="Email"
+                style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-family: 'Baloo 2', sans-serif;">
+            <input type="password" id="password" placeholder="Password"
+                style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-family: 'Baloo 2', sans-serif;">
+            <button onclick="login()" class="redeem-btn" style="width: 100%;">LOGIN</button>
+            <div id="message" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        var SUPABASE_URL = 'https://xtduanvxbgcnnwvkuiwp.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZHVhbnZ4Ymdjbm53dmt1aXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxMzYzMDAsImV4cCI6MjA3NTcxMjMwMH0.ZRpcpe2Vg2AOrxsEkFxSCSKIYMZYwtvC8PFllNAnNMU';
+
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!email || !password) {
+                messageDiv.innerHTML = '<div class="error">Please enter email and password</div>';
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                messageDiv.innerHTML = '<div class="success">Login successful! Redirecting...</div>';
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="error">Login failed: ${error.message}</div>`;
+            }
+        }
+
+        // Check if user is already logged in
+        window.onload = async function () {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                window.location.href = 'dashboard.html';
+            }
+        };
+    </script>
+</body>
+
+</html>
