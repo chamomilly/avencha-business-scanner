@@ -5,9 +5,14 @@ var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let stepCount = 0;
 
+// =======================
+// STEPS
+// =======================
+
 function addStep() {
     stepCount++;
     const container = document.getElementById('stepsContainer');
+
     const stepDiv = document.createElement('div');
     stepDiv.className = 'step-container';
     stepDiv.id = `step-${stepCount}`;
@@ -15,60 +20,60 @@ function addStep() {
     stepDiv.innerHTML = `
         <button onclick="removeStep(${stepCount})" class="remove-step-btn">Remove</button>
         <h4 style="color: #F7A829;">Step ${stepCount}</h4>
-        
+
         <div class="form-group">
             <label>Location</label>
-            <input type="text" id="step${stepCount}_location" placeholder="Location name">
+            <input type="text" id="step${stepCount}_location placeholder="Good Heavens Rooftop Bar">
         </div>
-        
+
         <div class="form-group">
             <label>Opening Hours</label>
-            <input type="text" id="step${stepCount}_openingHours" placeholder="e.g., 9am-5pm">
+            <input type="text" id="step${stepCount}_openingHours" placeholder="10am - 5pm">
         </div>
-        
+
         <div class="form-group">
             <label>Description</label>
-            <textarea id="step${stepCount}_description" placeholder="Step description"></textarea>
+            <textarea id="step${stepCount}_description" placeholder="Make sure to check both levels of the exhibition!"></textarea>
         </div>
-        
+
         <div class="form-group">
             <label>Map URL</label>
-            <input type="text" id="step${stepCount}_mapUrl" placeholder="Google Maps URL">
+            <input type="text" id="step${stepCount}_mapUrl" placeholder="lib/resources/images/heavensdoor/koorie_map.png">
         </div>
-        
+
         <div class="form-group">
             <label>Latitude</label>
-            <input type="number" step="any" id="step${stepCount}_latitude" placeholder="0.0">
+            <input type="number" step="any" id="step${stepCount}_latitude">
         </div>
-        
+
         <div class="form-group">
             <label>Longitude</label>
-            <input type="number" step="any" id="step${stepCount}_longitude" placeholder="0.0">
+            <input type="number" step="any" id="step${stepCount}_longitude">
         </div>
-        
+
         <div class="form-group">
             <label>Notes</label>
-            <textarea id="step${stepCount}_notes" placeholder="Additional notes"></textarea>
+            <textarea id="step${stepCount}_notes" placeholder="Entry is free, so just walk right in!"></textarea>
         </div>
-        
+
         <div class="form-group">
-            <label>Final Words (optional)</label>
-            <input type="text" id="step${stepCount}_finalWords" placeholder="Final words for this step">
+            <label>Final Words</label>
+            <input type="text" id="step${stepCount}_finalWords" placeholder="We hope you enjoyed Koorie Heritage Trust! It's a truly unique insight into Indigenous Culture in Australia. ">
         </div>
-        
+
         <div class="form-group">
-            <label>Inclusion Title (optional)</label>
-            <input type="text" id="step${stepCount}_inclusionTitle" placeholder="e.g., 1 drink">
+            <label>Inclusion Title</label>
+            <input type="text" id="step${stepCount}_inclusionTitle" placeholder="1 Drink for each person">
         </div>
-        
+
         <div class="form-group">
-            <label>Inclusion Options (optional)</label>
-            <input type="text" id="step${stepCount}_inclusionOptions" placeholder="Beer, Wine, Soft Drink">
+            <label>Inclusion Options</label>
+            <input type="text" id="step${stepCount}_inclusionOptions" placeholder="Aperol Spritz, Limoncello Spritz, Red Wine, White Wine, Pint of Beer or Soft Drink">
         </div>
-        
+
         <div class="form-group">
-            <label>Inclusion Instructions (optional)</label>
-            <textarea id="step${stepCount}_inclusionInstructions" placeholder="How to redeem"></textarea>
+            <label>Inclusion Instructions</label>
+            <textarea id="step${stepCount}_inclusionInstructions" placeholder="The staff will scan the QR Code above to verify and redeem your included drink"></textarea>
         </div>
 
         <div class="form-group">
@@ -80,7 +85,7 @@ function addStep() {
                 <option value="cipher">Cipher</option>
             </select>
         </div>
-        
+
         <div id="step${stepCount}_typeFields"></div>
     `;
 
@@ -88,8 +93,12 @@ function addStep() {
 }
 
 function removeStep(stepNum) {
-    document.getElementById(`step-${stepNum}`).remove();
+    document.getElementById(`step-${stepNum}`)?.remove();
 }
+
+// =======================
+// STEP TYPES
+// =======================
 
 function toggleStepTypeFields(stepNum) {
     const stepType = document.getElementById(`step${stepNum}_stepType`).value;
@@ -150,12 +159,17 @@ function toggleStepTypeFields(stepNum) {
     fieldsDiv.innerHTML = html;
 }
 
+// =======================
+// CREATE MAP
+// =======================
+
 async function createMap() {
     const messageDiv = document.getElementById('message');
     messageDiv.innerHTML = '';
 
+    await supabase.rpc('begin_transaction');
+
     try {
-        // Get map data
         const mapData = {
             name: document.getElementById('name').value,
             number_of_attendees: document.getElementById('numberOfAttendees').value,
@@ -167,7 +181,6 @@ async function createMap() {
             image_url: document.getElementById('imageUrl').value
         };
 
-        // Insert map
         const { data: map, error: mapError } = await supabase
             .from('adventure_maps')
             .insert(mapData)
@@ -176,22 +189,31 @@ async function createMap() {
 
         if (mapError) throw mapError;
 
-        // Insert tags
-        const tags = document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t);
-        if (tags.length > 0) {
-            const tagData = tags.map(tag => ({ map_id: map.id, tag }));
-            await supabase.from('map_tags').insert(tagData);
+        // =======================
+        // MAP INCLUSIONS INSERT
+        // =======================
+
+
+        const inclusions = document.getElementById('inclusions').value
+            .split(',')
+            .map(i => i.trim())
+            .filter(i => i);
+
+        if (inclusions.length > 0) {
+            await supabase.from('map_inclusions').insert(
+                inclusions.map(i => ({
+                    map_id: map.id,
+                    inclusion: i
+                }))
+            );
         }
 
-        // Insert requirements
-        const requirements = document.getElementById('requirements').value.split(',').map(r => r.trim()).filter(r => r);
-        if (requirements.length > 0) {
-            const reqData = requirements.map(requirement => ({ map_id: map.id, requirement }));
-            await supabase.from('map_requirements').insert(reqData);
-        }
+        // =======================
+        // STEPS
+        // =======================
 
-        // Get steps data
         const steps = [];
+
         for (let i = 1; i <= stepCount; i++) {
             if (!document.getElementById(`step-${i}`)) continue;
 
@@ -235,58 +257,50 @@ async function createMap() {
                         hint: wsHintEl.value
                     });
                 }
-            } else if (stepType === 'multipleChoice') {
-                const mcOptionsEl = document.getElementById(`step${i}_mcOptions`);
-                if (mcOptionsEl) {
-                    const options = mcOptionsEl.value
-                        .split('\n')
-                        .filter(o => o.trim())
-                        .map(o => {
-                            const [title, isCorrect] = o.split('|');
-                            return { title: title.trim(), isCorrect: isCorrect.trim() === 'true' };
-                        });
-                    stepData.multiple_choice_options = JSON.stringify(options);
-                }
-            } else if (stepType === 'cipher') {
-                const cipherTextEl = document.getElementById(`step${i}_cipherText`);
-                const cipherAnswerEl = document.getElementById(`step${i}_cipherAnswer`);
-                const cipherHintEl = document.getElementById(`step${i}_cipherHint`);
-                if (cipherTextEl && cipherAnswerEl && cipherHintEl) {
-                    const textList = cipherTextEl.value.split('\n').filter(t => t.trim());
-                    stepData.cipher = JSON.stringify({
-                        textList: textList,
-                        answer: cipherAnswerEl.value,
-                        hint: cipherHintEl.value
+            }
+            else if (stepType === 'multipleChoice') {
+                const raw = document.getElementById(`step${i}_mcOptions`).value;
+
+                const options = raw.split('\n')
+                    .filter(o => o.trim())
+                    .map((o, index) => {
+                        const parts = o.split('|');
+
+                        if (parts.length !== 2) {
+                            throw new Error(`Invalid MC format on line ${index + 1}`);
+                        }
+
+                        return {
+                            title: parts[0].trim(),
+                            isCorrect: parts[1].trim().toLowerCase() === 'true'
+                        };
                     });
-                }
+
+                stepData.multiple_choice_options = JSON.stringify(options);
             }
 
             steps.push(stepData);
         }
 
-        // Insert steps
         if (steps.length > 0) {
-            const { error: stepsError } = await supabase
-                .from('map_steps')
-                .insert(steps);
-
-            if (stepsError) throw stepsError;
+            const { error } = await supabase.from('map_steps').insert(steps);
+            if (error) throw error;
         }
+
+        await supabase.rpc('commit_transaction');
 
         messageDiv.innerHTML = '<div class="success">Map created successfully!</div>';
         setTimeout(() => location.reload(), 2000);
-
     } catch (error) {
-        messageDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+        await supabase.rpc('rollback_transaction');
+        messageDiv.innerHTML = error.message;
     }
 }
 
-async function logout() {
-    await supabase.auth.signOut();
-    window.location.href = 'index.html';
-}
+// =======================
+// AUTH
+// =======================
 
-// Check auth on load
 window.onload = async function () {
     const { data: { session } } = await supabase.auth.getSession();
 

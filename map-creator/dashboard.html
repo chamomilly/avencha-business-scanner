@@ -10,6 +10,7 @@
     <title>Avencha Creator Dashboard</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../scanner/style.css">
+
     <style>
         .form-group {
             margin: 15px 0;
@@ -34,10 +35,6 @@
             box-sizing: border-box;
         }
 
-        .form-group textarea {
-            min-height: 80px;
-        }
-
         .form-container {
             max-width: 800px;
             margin: 0 auto;
@@ -56,10 +53,10 @@
             padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
-            font-family: 'Baloo 2', sans-serif;
         }
 
-        .step-container {
+        .step-container,
+        .inclusion-container {
             background: rgba(0, 0, 0, 0.2);
             padding: 20px;
             border-radius: 10px;
@@ -73,7 +70,6 @@
             padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
-            font-family: 'Baloo 2', sans-serif;
             margin: 10px 0;
         }
 
@@ -84,7 +80,6 @@
             padding: 5px 15px;
             border-radius: 15px;
             cursor: pointer;
-            font-family: 'Baloo 2', sans-serif;
             float: right;
         }
     </style>
@@ -94,11 +89,13 @@
     <button onclick="logout()" class="logout-btn">Logout</button>
 
     <div class="container">
-        <a href="../index.html"><img src="../scanner/resources/logo.svg" alt="Advencha"></a>
+        <a href="../index.html"><img src="../scanner/resources/logo.svg"></a>
 
         <h2>Create Avencha Map</h2>
 
         <div class="form-container">
+
+            <!-- ================= MAP DETAILS ================= -->
             <h3 style="color: #F7A829;">Map Details</h3>
 
             <div class="form-group">
@@ -113,7 +110,7 @@
 
             <div class="form-group">
                 <label>Cost ($)</label>
-                <input type="number" id="cost" step="0.01" placeholder="0.00">
+                <input type="number" id="cost" step="0.01" placeholder="10.00">
             </div>
 
             <div class="form-group">
@@ -123,12 +120,12 @@
 
             <div class="form-group">
                 <label>Location</label>
-                <input type="text" id="location" placeholder="City or area">
+                <input type="text" id="location" placeholder="Melbourne CBD">
             </div>
 
             <div class="form-group">
                 <label>Description</label>
-                <textarea id="description" placeholder="Describe the adventure"></textarea>
+                <textarea id="description" placeholder="Describe the avencha"></textarea>
             </div>
 
             <div class="form-group">
@@ -148,18 +145,29 @@
 
             <div class="form-group">
                 <label>Image URL</label>
-                <input type="text" id="imageUrl" placeholder="https://...">
+                <input type="text" id="imageUrl">
             </div>
 
+            <!-- ================= MAP INCLUSIONS ================= -->
+            <div class="form-group">
+                <label>Inclusions (comma separated)</label>
+                <input type="text" id="inclusions" placeholder="1 drink, Entry ticket, Dessert">
+            </div>
+
+            <!-- ================= STEPS ================= -->
             <h3 style="color: #F7A829; margin-top: 40px;">Map Steps</h3>
 
             <div id="stepsContainer"></div>
 
             <button onclick="addStep()" class="add-step-btn">+ Add Step</button>
 
-            <button onclick="createMap()" class="redeem-btn" style="width: 100%; margin-top: 20px;">CREATE MAP</button>
+            <!-- ================= SUBMIT ================= -->
+            <button onclick="createMap()" class="redeem-btn" style="width: 100%; margin-top: 20px;">
+                CREATE MAP
+            </button>
 
             <div id="message" style="margin-top: 20px;"></div>
+
         </div>
     </div>
 
